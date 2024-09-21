@@ -2,3 +2,7 @@
 Repositório com as tarefas passadas na disciplina.
 
 ### Tarefa 01 [ 20/09 ]
+Implementação de um algoritmo para resolver o problema da mochila utilizando uma heurística aleatória e uma heurística gulosa.
+
+### Tarefa 02 [ 27/09 ]
+Implementação de um algoritmo para resolver o problema da mochila utilizando uma heurística gulosa randomizada.
