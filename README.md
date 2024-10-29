@@ -9,3 +9,6 @@ Implementação de um algoritmo para resolver o problema da mochila utilizando u
 
 ### Tarefa 03 [ 04/10 ]
 Implementação de um algoritmo para resolver o problema da mochila utilizando Best Improvement e First Improvement com busca local.
+
+### Tarefa 04 [ 25/10 ]
+Implementação de duas meta heurísticas para resolver o problema da mochila.
