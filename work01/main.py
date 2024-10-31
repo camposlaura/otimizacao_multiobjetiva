@@ -4,16 +4,26 @@ import math
 import time
 import os
 
-TEMP_INICIAL = 500
-TEMP_FINAL = 1
-ALFA = 0.95
-ITERACOES_SA = 1000
-ITERACOES_GRASP = 1000
+# Calibra as meta heurísticas
 LIMITE_TEMPO = 10
+GRASP_ITERACOES = 1000
+SA_ITERACOES = 1000
+SA_TEMP_INICIAL = 500
+SA_TEMP_FINAL = 1
+SA_ALFA = 0.95
 
-DADOS = [ 'partnum-15-1.txt', 'partnum-15-2.txt', 'partnum-15-3.txt', 'partnum-15-4.txt', 'partnum-15-5.txt', 'partnum-35-1.txt', 'partnum-35-2.txt', 'partnum-35-3.txt', 'partnum-35-4.txt', 'partnum-35-5.txt', 'partnum-55-1.txt', 'partnum-55-2.txt', 'partnum-55-3.txt', 'partnum-55-4.txt', 'partnum-55-5.txt', 'partnum-75-1.txt', 'partnum-75-2.txt', 'partnum-75-3.txt', 'partnum-75-4.txt', 'partnum-75-5.txt', 'partnum-95-1.txt', 'partnum-95-2.txt', 'partnum-95-3.txt', 'partnum-95-4.txt', 'partnum-95-5.txt' ]
+DADOS = [ './dados/partnum-15-1.txt', './dados/partnum-15-2.txt', './dados/partnum-15-3.txt', './dados/partnum-15-4.txt', './dados/partnum-15-5.txt', './dados/partnum-35-1.txt', './dados/partnum-35-2.txt', './dados/partnum-35-3.txt', './dados/partnum-35-4.txt', './dados/partnum-35-5.txt', './dados/partnum-55-1.txt', './dados/partnum-55-2.txt', './dados/partnum-55-3.txt', './dados/partnum-55-4.txt', './dados/partnum-55-5.txt', './dados/partnum-75-1.txt', './dados/partnum-75-2.txt', './dados/partnum-75-3.txt', './dados/partnum-75-4.txt', './dados/partnum-75-5.txt', './dados/partnum-95-1.txt', './dados/partnum-95-2.txt', './dados/partnum-95-3.txt', './dados/partnum-95-4.txt', './dados/partnum-95-5.txt' ]
 
 def carregarDados(arquivo_path):
+    """
+    Carrega o conjunto de números de um arquivo de dados.
+
+    Parâmetros:
+    - arquivo_path (str): Caminho para o arquivo de dados.
+
+    Retorna:
+    - int[]: Uma lista com os números contidos no arquivo.
+    """
     with open(arquivo_path, 'r') as file:
         qtdItens = int(file.readline().strip())
         
@@ -25,28 +35,69 @@ def carregarDados(arquivo_path):
         return(conjunto)
 
 def avaliaSolucao(solucao, numeros):
+    """
+    Avalia uma solução calculando a diferença entre as somas dos subconjuntos.
+
+    Parâmetros:
+    - solucao (boolean[]): Lista binária indicando a partição dos números (0 ou 1).
+    - numeros (int[]): Lista de números inteiros a serem particionados.
+
+    Retorna:
+    - int: Diferença absoluta entre as somas dos subconjuntos.
+    """
     soma1 = sum(n for i, n in enumerate(numeros) if solucao[i] == 1)
     soma2 = sum(n for i, n in enumerate(numeros) if solucao[i] == 0)
     return abs(soma1 - soma2)
 
 def geraSolucaoInicial(n):
+    """
+    Gera uma solução inicial aleatória para o problema.
+
+    Parâmetros:
+    - n (int): Número de elementos no conjunto de números.
+
+    Retorna:
+    - boolean[]: Solução inicial aleatória representada por uma lista binária.
+    """
     return [random.choice([0, 1]) for _ in range(n)]
 
 def perturbaSolucao(solucao):
+    """
+    Meta Heurística: Simulated Annealing
+
+    Perturba a solução atual alterando aleatoriamente um elemento da partição.
+
+    Parâmetros:
+    - solucao (boolean[]): Solução atual representada por uma lista binária.
+
+    Retorna:
+    - boolean[]: Nova solução com um elemento alterado.
+    """
     nova_solucao = solucao[:]
     indice = random.randint(0, len(solucao) - 1)
     nova_solucao[indice] = 1 - nova_solucao[indice]
     return nova_solucao
 
 def simulatedAnnealing(numeros):
+    """
+    Meta Heurística: Simulated Annealing
+
+    Aplica SA para encontrar uma partição ótima.
+
+    Parâmetros:
+    - numeros (int[]): Lista de números inteiros a serem particionados.
+
+    Retorna:
+    - [boolean[], int]: Melhor solução encontrada e a diferença mínima entre as somas dos subconjuntos.
+    """
     n = len(numeros)
     solucaoAtual = geraSolucaoInicial(n)
     melhorSolucao = solucaoAtual[:]
     melhorDiferenca = avaliaSolucao(melhorSolucao, numeros)
-    temperatura = TEMP_INICIAL
+    temperatura = SA_TEMP_INICIAL
 
-    while temperatura > TEMP_FINAL:
-        for _ in range(ITERACOES_SA):
+    while temperatura > SA_TEMP_FINAL:
+        for _ in range(SA_ITERACOES):
             novaSolucao = perturbaSolucao(solucaoAtual)
             diferencaAtual = avaliaSolucao(solucaoAtual, numeros)
             novaDiferenca = avaliaSolucao(novaSolucao, numeros)
@@ -59,11 +110,23 @@ def simulatedAnnealing(numeros):
                 melhorSolucao = novaSolucao[:]
                 melhorDiferenca = novaDiferenca
 
-        temperatura *= ALFA
+        temperatura *= SA_ALFA
 
     return melhorSolucao, melhorDiferenca
 
 def buscaLocal(solucao, numeros):
+    """
+    Meta Heurística: GRASP
+
+    Realiza busca local para melhorar a solução atual, encontrando uma partição com menor diferença entre as somas.
+
+    Parâmetros:
+    - solucao (boolean[]): Solução inicial representada por uma lista binária.
+    - numeros (int[]): Lista de números inteiros a serem particionados.
+
+    Retorna:
+    - [boolean[], int]: Melhor solução encontrada e a diferença mínima entre as somas dos subconjuntos.
+    """
     melhorSolucao = solucao[:]
     melhorDiferenca = avaliaSolucao(melhorSolucao, numeros)
 
@@ -79,10 +142,21 @@ def buscaLocal(solucao, numeros):
     return melhorSolucao, melhorDiferenca
 
 def grasp(numeros):
+    """
+    Meta Heurística: GRASP
+
+    Aplica GRASP para encontrar uma partição ótima.
+
+    Parâmetros:
+    - numeros (int[]): Lista de números inteiros a serem particionados.
+
+    Retorna:
+    - [boolean[], int]: Melhor solução encontrada e a diferença mínima entre as somas dos subconjuntos.
+    """
     melhorSolucao = geraSolucaoInicial(len(numeros))
     melhorDiferenca = avaliaSolucao(melhorSolucao, numeros)
 
-    for _ in range(ITERACOES_GRASP):
+    for _ in range(GRASP_ITERACOES):
         solucao = geraSolucaoInicial(len(numeros))
         solucao, diferenca = buscaLocal(solucao, numeros)
 
@@ -93,6 +167,14 @@ def grasp(numeros):
     return melhorSolucao, melhorDiferenca
 
 def comparacao(numeros):
+    """
+    Compara o desempenho das meta heurísticas Simulated Annealing e GRASP no problema.
+
+    Parâmetros:
+    - numeros (int[]): Lista de números inteiros a serem particionados.
+
+    Exibe os tempos médios e as diferenças médias entre as somas dos subconjuntos para cada meta heurística.
+    """
     tempoSA, tempoGRASP = 0, 0
     resultadosSA, resultadosGRASP = [], []
 
@@ -116,7 +198,8 @@ def comparacao(numeros):
     print(f'Média GRASP: {mediaGRASP}')
     print(f'Tempo Médio GRASP: {tempoGRASP:.6f} segundos\n')
 
-conjuntos = [carregarDados(f'./dados/{caminho}') for caminho in DADOS]
+# Carrega os dados e executa as meta heurísticas
+conjuntos = [carregarDados(caminho) for caminho in DADOS]
 for numeros in conjuntos:
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(comparacao, numeros)
