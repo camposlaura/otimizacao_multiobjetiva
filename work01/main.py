@@ -11,20 +11,18 @@ ITERACOES_SA = 1000
 ITERACOES_GRASP = 1000
 LIMITE_TEMPO = 10
 
-DADOS = ['partnum-15-1.txt', 'partnum-15-2.txt', 'partnum-15-3.txt', 'partnum-15-4.txt', 'partnum-15-5.txt', ]
+DADOS = [ 'partnum-15-1.txt', 'partnum-15-2.txt', 'partnum-15-3.txt', 'partnum-15-4.txt', 'partnum-15-5.txt', 'partnum-35-1.txt', 'partnum-35-2.txt', 'partnum-35-3.txt', 'partnum-35-4.txt', 'partnum-35-5.txt', 'partnum-55-1.txt', 'partnum-55-2.txt', 'partnum-55-3.txt', 'partnum-55-4.txt', 'partnum-55-5.txt', 'partnum-75-1.txt', 'partnum-75-2.txt', 'partnum-75-3.txt', 'partnum-75-4.txt', 'partnum-75-5.txt', 'partnum-95-1.txt', 'partnum-95-2.txt', 'partnum-95-3.txt', 'partnum-95-4.txt', 'partnum-95-5.txt' ]
 
 def carregarDados(arquivo_path):
     with open(arquivo_path, 'r') as file:
-        for linha in file:
-            qtdItens = int(linha.strip())
-            conjunto = []
+        qtdItens = int(file.readline().strip())
+        
+        conjunto = []
+        for i in range(qtdItens):
+            numero = int(file.readline().strip())
+            conjunto.append(numero)
 
-            for i in range(qtdItens):
-                numero = int(file.readline().strip())
-                conjunto.append(numero)
-
-            print('conjunto:', conjunto)
-            return(conjunto)
+        return(conjunto)
 
 def avaliaSolucao(solucao, numeros):
     soma1 = sum(n for i, n in enumerate(numeros) if solucao[i] == 1)
@@ -118,8 +116,8 @@ def comparacao(numeros):
     print(f'Média GRASP: {mediaGRASP}')
     print(f'Tempo Médio GRASP: {tempoGRASP:.6f} segundos\n')
 
-conjunto = [carregarDados('./dados/' + DADOS[0])]
-for numeros in conjunto:
+conjuntos = [carregarDados(f'./dados/{caminho}') for caminho in DADOS]
+for numeros in conjuntos:
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(comparacao, numeros)
         try:
