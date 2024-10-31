@@ -12,6 +12,7 @@ SA_TEMP_INICIAL = 500
 SA_TEMP_FINAL = 1
 SA_ALFA = 0.95
 
+MEUS_DADOS = [ './meus_dados/partnum-35-1.txt', './meus_dados/partnum-35-2.txt', './meus_dados/partnum-35-3.txt', './meus_dados/partnum-35-4.txt', './meus_dados/partnum-35-5.txt' ]
 DADOS = [ './dados/partnum-15-1.txt', './dados/partnum-15-2.txt', './dados/partnum-15-3.txt', './dados/partnum-15-4.txt', './dados/partnum-15-5.txt', './dados/partnum-35-1.txt', './dados/partnum-35-2.txt', './dados/partnum-35-3.txt', './dados/partnum-35-4.txt', './dados/partnum-35-5.txt', './dados/partnum-55-1.txt', './dados/partnum-55-2.txt', './dados/partnum-55-3.txt', './dados/partnum-55-4.txt', './dados/partnum-55-5.txt', './dados/partnum-75-1.txt', './dados/partnum-75-2.txt', './dados/partnum-75-3.txt', './dados/partnum-75-4.txt', './dados/partnum-75-5.txt', './dados/partnum-95-1.txt', './dados/partnum-95-2.txt', './dados/partnum-95-3.txt', './dados/partnum-95-4.txt', './dados/partnum-95-5.txt' ]
 
 def carregarDados(arquivo_path):
@@ -199,7 +200,7 @@ def comparacao(numeros):
     print(f'Tempo Médio GRASP: {tempoGRASP:.6f} segundos\n')
 
 # Carrega os dados e executa as meta heurísticas
-conjuntos = [carregarDados(caminho) for caminho in DADOS]
+conjuntos = [carregarDados(caminho) for caminho in MEUS_DADOS]
 for numeros in conjuntos:
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future = executor.submit(comparacao, numeros)
